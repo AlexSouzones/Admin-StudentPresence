@@ -1,4 +1,4 @@
-﻿# O que é este projeto?
+﻿# O que é este Projeto?
 StudentPresence é um sistema de gerenciamento de presença de alunos, dividido em duas partes independentes: Admin e User.
 
 ### Admin:
