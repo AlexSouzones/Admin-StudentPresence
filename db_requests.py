@@ -43,7 +43,7 @@ class LocalDB:
     def select_table(
         self, table_name: str, column: str, value: str
     ) -> list[tuple[str]]:
-        insert_sql = f"select * from {table_name} WHERE {column} = {value}"
+        insert_sql = f"select * from {table_name} WHERE {column} = '{value}'"
         self.__open_connection()
         self.cursor.execute(insert_sql)
         result = self.cursor.fetchall()
@@ -128,5 +128,3 @@ if __name__ == "__main__":
     db.create_table(TABLE_ATIVIDADE, COLUMNS_ATIVIDADE)
     db.create_table(TABLE_POLO, COLUMNS_POLO)
     db.create_table(TABLE_CADASTRO, COLUMNS_CADASTRO)
-    print(db.load_table(TABLE_ALUNOS))
-    print(db.unique_key(TABLE_ATIVIDADE, "COD_ATIVIDADE"))

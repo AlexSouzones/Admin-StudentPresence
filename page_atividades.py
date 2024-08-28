@@ -1,5 +1,6 @@
 import db_requests
 from tkinter import ttk, messagebox
+from planilha import planilha_insert
 
 
 class PageAtividades:
@@ -37,19 +38,34 @@ class PageAtividades:
             self.atividades_tab, text="Excluir Atividade", command=self.delete_activity
         )
         delete_button.pack(pady=10)
+        download_button = ttk.Button(
+            self.atividades_tab, text="Baixar Atividade", command=self.download_activity
+        )
+        download_button.pack(pady=10)
 
     def add_activity(
         self, code: str, disciplina: str, data: str, hora: str, status: str
     ):
-        if status == "encerrado":
-            self.atividades_tree.insert(
-                "", "end", id=code, values=(status, disciplina, data, hora, "Download")
+        self.atividades_tree.insert(
+            "", "end", id=code, values=(status, disciplina, data, hora)
+        )
+    
+    def download_activity(self):
+        selected_item = self.atividades_tree.selection()
+        print(selected_item[0])
+        if selected_item:
+            item_data = self.atividades_tree.item(selected_item)
+            values: str = item_data["values"]
+            db = db_requests.LocalDB()
+            info = db.select_table("alunos", "COD_ATIVIDADE", selected_item[0])
+            planilha_insert(info, values[1])
+            messagebox.showinfo(
+                "Concluído!", f"A planilha foi gerada com sucesso!"
             )
         else:
-            self.atividades_tree.insert(
-                "", "end", id=code, values=(status, disciplina, data, hora, "-")
+            messagebox.showwarning(
+                "Aviso!", f"Escolha qual atividade deseja baixar primeiro!"
             )
-
     def delete_activity(self):
         selected_item = self.atividades_tree.selection()
         if selected_item:
@@ -62,6 +78,8 @@ class PageAtividades:
 
             if confirm:
                 db = db_requests.LocalDB()
+                db.delete_in_table("polos", "COD_ATIVIDADE", selected_item[0])
+                db.delete_in_table("alunos", "COD_ATIVIDADE", selected_item[0])
                 db.delete_in_table("atividades", "COD_ATIVIDADE", selected_item[0])
                 self.atividades_tree.delete(selected_item)
         else:

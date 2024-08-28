@@ -90,7 +90,7 @@ class PageCarregamento:
                 "DISCIPLINA": self.excel_instance.disciplina,
                 "DATA": f"{data}",
                 "HORA": f"{hora}",
-                "STATUS": "Aguardando",
+                "STATUS": "Encerrado",
             }
             TABLE_POLO = "polos"
 
