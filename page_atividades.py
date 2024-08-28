@@ -18,7 +18,7 @@ class PageAtividades:
         scrollbar = ttk.Scrollbar(self.atividades_tab)
         scrollbar.pack(side="right", fill="y")
 
-        columns = ("status", "disciplina", "data", "hora", "download")
+        columns = ("status", "disciplina", "data", "hora")
         self.atividades_tree = ttk.Treeview(
             self.atividades_tab,
             columns=columns,
@@ -56,11 +56,16 @@ class PageAtividades:
         if selected_item:
             item_data = self.atividades_tree.item(selected_item)
             values: str = item_data["values"]
-            db = db_requests.LocalDB()
-            info = db.select_table("alunos", "COD_ATIVIDADE", selected_item[0])
-            planilha_insert(info, values[1])
-            messagebox.showinfo(
-                "Concluído!", f"A planilha foi gerada com sucesso!"
+            if values[0] == "Encerrado":
+                db = db_requests.LocalDB()
+                info = db.select_table("alunos", "COD_ATIVIDADE", selected_item[0])
+                planilha_insert(info, values[1])
+                messagebox.showinfo(
+                    "Concluído!", f"A planilha foi gerada com sucesso!"
+                )
+            else:
+                messagebox.showwarning(
+                "Aviso!", f"A atividade ainda não foi encerrada!"
             )
         else:
             messagebox.showwarning(

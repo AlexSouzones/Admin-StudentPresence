@@ -14,7 +14,6 @@ def planilha_insert(
     workbook = openpyxl.load_workbook(nome_arquivo_copia)
     sheet = workbook.active
 
-    # Encontra a primeira linha vazia
     for row in sheet.iter_rows(min_row=2, max_col=1, max_row=sheet.max_row):
         if not row[0].value:
             primeira_linha_vazia = row[0].row
@@ -22,12 +21,11 @@ def planilha_insert(
     else:
         primeira_linha_vazia = sheet.max_row + 1
 
-    # Insere os dados na linha vazia encontrada
     for item in dados:
         linha = [item[0], item[1], item[2], item[3], item[4], item[5], item[7].upper()]
         for col_num, value in enumerate(linha, start=1):
             sheet.cell(row=primeira_linha_vazia, column=col_num, value=value)
-        primeira_linha_vazia += 1  # Move para a próxima linha vazia
+        primeira_linha_vazia += 1
 
     # Salva o arquivo
     workbook.save(nome_arquivo_copia)
