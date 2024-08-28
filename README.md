@@ -1,4 +1,9 @@
-﻿# O que é este Projeto?
+﻿# Tecnologias Utilizadas:
+- <img align="center" alt="Rafa-CSS" height="40" width="40" src="https://skillicons.dev/icons?i=sqlite"> Sqlite3 
+- <img align="center" alt="Rafa-CSS" height="40" width="40" src="https://skillicons.dev/icons?i=qt"> Qt (Tkinter)
+- <img align="center" alt="Rafa-CSS" height="40" width="40" src="https://avatars.githubusercontent.com/u/8123570?s=200&v=4"> Pandas
+
+# O que é este Projeto?
 StudentPresence é um sistema de gerenciamento de presença de alunos, dividido em duas partes independentes: Admin e User.
 
 ### Admin:
@@ -29,11 +34,6 @@ Siga os seguintes passos para que consiga vizualizar bem:
 - Ao clicar em "Subir Dados", o cadastramento da atividade será concluído.
 - Cadastro: Cria um acesso para um polo, desde que o nome e o código correspondam a algum dos registrados na planilha. Isso permitirá o acesso à aplicação para o registro de presenças.
 ![alt text](readme_img/image-5.png)
-
-# Tecnologias Utilizadas:
-- <img align="center" alt="Rafa-CSS" height="40" width="40" src="https://skillicons.dev/icons?i=sqlite"> Sqlite3 
-- <img align="center" alt="Rafa-CSS" height="40" width="40" src="https://skillicons.dev/icons?i=qt"> Qt (Tkinter)
-- <img align="center" alt="Rafa-CSS" height="40" width="40" src="https://avatars.githubusercontent.com/u/8123570?s=200&v=4"> Pandas
 
 # Status do Projeto:
 - Em andamento.
