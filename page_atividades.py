@@ -1,6 +1,7 @@
 import db_requests
 from tkinter import ttk, messagebox
 from planilha import planilha_insert
+from utils import verificar_data, verificar_horario
 
 
 class PageAtividades:
@@ -9,7 +10,16 @@ class PageAtividades:
         db = db_requests.LocalDB()
         self.atividades = db.load_table("atividades")
         for atividade in self.atividades:
-            self.add_activity(*atividade)
+            status_data = verificar_data(atividade[2])
+            if status_data == "Em Andamento":
+                if verificar_horario(atividade[3]):
+                    self.add_activity(*atividade, "Em Andamento")
+                    continue
+                else:
+                    self.add_activity(*atividade, "Aguardando")
+                    continue
+            self.add_activity(*atividade, status_data)
+            
 
     def create_atividades_tab(self):
         self.atividades_tab = ttk.Frame(self.notebook)
@@ -52,7 +62,6 @@ class PageAtividades:
     
     def download_activity(self):
         selected_item = self.atividades_tree.selection()
-        print(selected_item[0])
         if selected_item:
             item_data = self.atividades_tree.item(selected_item)
             values: str = item_data["values"]

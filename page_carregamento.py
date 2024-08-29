@@ -1,6 +1,7 @@
 import db_requests
 from tkinter import ttk, filedialog, messagebox
 from planilha import PlanilhaManager
+from utils import verificar_formato_data, verificar_formato_horario
 
 
 class PageCarregamento:
@@ -55,13 +56,22 @@ class PageCarregamento:
 
     def upload_spreadsheet(self):
         try:
-            file_path = filedialog.askopenfilename(
+            try:
+                self.file_path = None
+                self.carregamento_tree.delete(*self.carregamento_tree.get_children())
+                self.data_entry.delete(0, "end")
+                self.hora_entry.delete(0, "end")
+                self.subir_dados_button.delete(0, "end")
+                self.carregamento_tree.delete()
+            except:
+                ...
+            self.file_path = filedialog.askopenfilename(
                 filetypes=[("Excel files", "*.xlsx")]
             )
-            self.excel_instance = PlanilhaManager(file_path)
+            self.excel_instance = PlanilhaManager(self.file_path)
             self.excel_instance.loading()
             self.add_activits(self.excel_instance.info)
-            if file_path:
+            if self.file_path:
                 self.data_entry.pack(pady=5)
                 self.data_entry.insert(0, "DD/MM/AAAA")
                 self.hora_entry.pack(pady=5)
@@ -75,55 +85,72 @@ class PageCarregamento:
             )
 
     def upload_data(self):
-        try:
-            db = db_requests.LocalDB()
-            cod_atividade = db.unique_key("atividades", "COD_ATIVIDADE")
-            data = self.data_entry.get()
-            hora = self.hora_entry.get()
-            sql_polo = """INSERT INTO polos (COD_POLO, POLO_EAD, COD_ATIVIDADE)
-        VALUES (?, ?, ?)"""
-            sql_aluno = """INSERT INTO alunos (COD_POLO, POLO_EAD, RA, ALUNO, CURSO, DISCIPLINA, COD_ATIVIDADE, Presente)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)"""
-            TABLE_ATIVIDADE = "atividades"
-            COLUMNS_ATIVIDADE = {
-                "COD_ATIVIDADE": f"{cod_atividade}",
-                "DISCIPLINA": self.excel_instance.disciplina,
-                "DATA": f"{data}",
-                "HORA": f"{hora}",
-                "STATUS": "Encerrado",
-            }
-            TABLE_POLO = "polos"
+        data = self.data_entry.get()
+        hora = self.hora_entry.get()
+        if verificar_formato_horario(hora) and verificar_formato_data(data):
+            try:
+                db = db_requests.LocalDB()
+                cod_atividade = db.unique_key("atividades", "COD_ATIVIDADE")
 
-            db.insert_table(TABLE_ATIVIDADE, COLUMNS_ATIVIDADE)
-            lista_polo = [
-                (polo["COD POLO"], polo["Polo"], cod_atividade)
-                for polo in self.excel_instance.info
-            ]
-            db.insert_big_data(TABLE_POLO, sql_polo, lista_polo)
-            for polo in self.excel_instance.info:
-                cod_polo = polo["COD POLO"]
-                polo_ead = polo["Polo"]
+                sql_polo = """INSERT INTO polos (COD_POLO, POLO_EAD, COD_ATIVIDADE)
+            VALUES (?, ?, ?)"""
+                sql_aluno = """INSERT INTO alunos (COD_POLO, POLO_EAD, RA, ALUNO, CURSO, DISCIPLINA, COD_ATIVIDADE, Presente)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)"""
+                TABLE_ATIVIDADE = "atividades"
+                COLUMNS_ATIVIDADE = {
+                    "COD_ATIVIDADE": f"{cod_atividade}",
+                    "DISCIPLINA": self.excel_instance.disciplina,
+                    "DATA": f"{data}",
+                    "HORA": f"{hora}",
+                }
+                TABLE_POLO = "polos"
 
-                lista_alunos = [
-                    (
-                        cod_polo,
-                        polo_ead,
-                        aluno["matricula"],
-                        aluno["nome"],
-                        aluno["Curso"],
-                        aluno["Disciplina"],
-                        cod_atividade,
-                        "Aguardando",
-                    )
-                    for aluno in polo["Alunos"]
+                db.insert_table(TABLE_ATIVIDADE, COLUMNS_ATIVIDADE)
+                lista_polo = [
+                    (polo["COD POLO"], polo["Polo"], cod_atividade)
+                    for polo in self.excel_instance.info
                 ]
-                db.insert_big_data("alunos", sql_aluno, lista_alunos)
-            self.load_activity()
-            messagebox.showinfo("Dados Upados", "A atividade foi registrada!")
-        except Exception as erro:
-            messagebox.showerror(
-                "Dados Não Upados",
-                f"Aconteceu algum problema ao tentar subir os dados para o banco!\n{erro}",
+                db.insert_big_data(TABLE_POLO, sql_polo, lista_polo)
+                for polo in self.excel_instance.info:
+                    cod_polo = polo["COD POLO"]
+                    polo_ead = polo["Polo"]
+
+                    lista_alunos = [
+                        (
+                            cod_polo,
+                            polo_ead,
+                            aluno["matricula"],
+                            aluno["nome"],
+                            aluno["Curso"],
+                            aluno["Disciplina"],
+                            cod_atividade,
+                            "Aguardando",
+                        )
+                        for aluno in polo["Alunos"]
+                    ]
+                    db.insert_big_data("alunos", sql_aluno, lista_alunos)
+                self.load_activity()
+                try:
+                    self.file_path = None
+                    self.carregamento_tree.delete(
+                        *self.carregamento_tree.get_children()
+                    )
+                    self.carregamento_tree.delete()
+                    self.data_entry.delete(0, "end")
+                    self.hora_entry.delete(0, "end")
+                    self.subir_dados_button.delete(0, "end")
+                except:
+                    ...
+                messagebox.showinfo("Dados Upados", "A atividade foi registrada!")
+            except Exception as erro:
+                messagebox.showerror(
+                    "Dados Não Upados",
+                    f"Aconteceu algum problema ao tentar subir os dados para o banco!\n{erro}",
+                )
+        else:
+            messagebox.showwarning(
+                "Atenção!",
+                "Data ou Hora não seguem o padrão estabelecido!\nData: 'DD/MM/AAAA'\nHora: 'HH:MM' (Padrão 24h e não 12h)",
             )
 
 

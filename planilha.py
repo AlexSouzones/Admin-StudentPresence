@@ -27,9 +27,7 @@ def planilha_insert(
             sheet.cell(row=primeira_linha_vazia, column=col_num, value=value)
         primeira_linha_vazia += 1
 
-    # Salva o arquivo
     workbook.save(nome_arquivo_copia)
-    print(f"Dados salvos em {nome_arquivo_copia}")
 
 
 class PlanilhaManager:

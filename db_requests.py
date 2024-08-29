@@ -111,7 +111,6 @@ if __name__ == "__main__":
         "DISCIPLINA": "TEXT",
         "DATA": "DATE",
         "HORA": "TIME",
-        "STATUS": "TEXT",
     }
 
     TABLE_POLO = "polos"
